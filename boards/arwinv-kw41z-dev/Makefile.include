@@ -1,0 +1,15 @@
+# Configure riotboot bootloader and slot lengths.
+RIOTBOOT_LEN ?= 0x4000
+NUM_SLOTS ?= 2
+SLOT0_LEN ?= 0x3C000
+SLOT1_LEN ?= $(SLOT0_LEN)
+
+# Flash using jlink adapter
+PROGRAMMER ?= jlink
+JLINK_DEVICE = MKW41Z512XXX4
+JLINK_PRE_FLASH = r
+JLINK_SPEED = 4000
+include $(RIOTMAKE)/tools/jlink.inc.mk
+
+# Include default FRDM board config for openocd configuration
+include $(RIOTBOARD)/common/frdm/Makefile.include
