@@ -69,8 +69,8 @@ void openthread_bootstrap(void)
     netdev_t *netdev = (netdev_t *) &at86rf2xx_dev;
 #endif
 #ifdef MODULE_KW41ZRF
-	kw41zrf_setup(&kw41z_dev);
-	netdev_t *netdev = (netdev_t *) &kw41z_dev;
+    kw41zrf_setup(&kw41z_dev);
+    netdev_t *netdev = (netdev_t *) &kw41z_dev;
 #endif
 
     openthread_radio_init(netdev, tx_buf, rx_buf);
