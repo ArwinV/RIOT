@@ -96,6 +96,15 @@ typedef struct {
 } ot_job_t;
 
 /**
+ * @brief   Struct containing context for OpenThread UDP
+ */
+typedef struct {
+    otUdpSocket ot_sock;                                      /**< OpenThread UDP socket */
+    void cb(void*, otMessage*, const otMessageInfo*)          /**< Callback function */
+    void* context;                                            /**< Application specific context */
+} ot_udp_context_t;
+
+/**
  * @brief Gets packet from driver and tells OpenThread about the reception.
  *
  * @param[in]  aInstance          pointer to an OpenThread instance

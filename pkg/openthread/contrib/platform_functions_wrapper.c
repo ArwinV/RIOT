@@ -26,7 +26,7 @@
 #include "openthread/udp.h"
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG (1)
 #include "debug.h"
 
 typedef uint8_t OT_COMMAND;
@@ -42,6 +42,7 @@ OT_COMMAND ot_panid(otInstance* ot_instance, void* arg, void* answer);
 OT_COMMAND ot_parent(otInstance* ot_instance, void* arg, void* answer);
 OT_COMMAND ot_state(otInstance* ot_instance, void* arg, void* answer);
 OT_COMMAND ot_thread(otInstance* ot_instance, void* arg, void* answer);
+OT_COMMAND ot_udpopen(otInstance* ot_instance, void* arg, void* answer);
 
 /**
  * @brief   Struct containing an OpenThread job command
@@ -75,6 +76,8 @@ const ot_command_t otCommands[] =
     { "state", &ot_state },
     /* thread: arg "start"/"stop": start/stop thread operation */
     { "thread", &ot_thread },
+    /* udpopen: arg callback function: open udp socket */
+    { "udpopen", &ot_udpopen },
 };
 
 uint8_t ot_exec_command(otInstance *ot_instance, const char* command, void *arg, void* answer) {
@@ -306,6 +309,20 @@ OT_COMMAND ot_thread(otInstance* ot_instance, void* arg, void* answer) {
         } else {
             DEBUG("ERROR: thread available args: start/stop\n");
         }
+    } else {
+        DEBUG("ERROR: wrong argument\n");
+    }
+    return 0;
+}
+
+OT_COMMAND ot_udpopen(otInstance* ot_instance, void* arg, void* answer) {
+    (void)answer;
+
+    ot_udp_context_t *ctx = arg;
+    if (arg != NULL) {
+	    memset(ctx->ot_sock, 0, sizeof(otUdpSocket));	
+		otUdpOpen(ot_instance, ctx->ot_sock, ctx->cb, ctx->context);
+		DEBUG("Udp open\m");
     } else {
         DEBUG("ERROR: wrong argument\n");
     }
