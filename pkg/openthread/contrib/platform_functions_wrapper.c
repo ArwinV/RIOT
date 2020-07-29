@@ -320,9 +320,9 @@ OT_COMMAND ot_udpopen(otInstance* ot_instance, void* arg, void* answer) {
 
     ot_udp_context_t *ctx = arg;
     if (arg != NULL) {
-	    memset(ctx->ot_sock, 0, sizeof(otUdpSocket));	
-		otUdpOpen(ot_instance, ctx->ot_sock, ctx->cb, ctx->context);
-		DEBUG("Udp open\m");
+        memset(ctx->ot_sock, 0, sizeof(otUdpSocket));	
+        otUdpOpen(ot_instance, ctx->ot_sock, ctx->cb, ctx->context);
+        DEBUG("Udp open\n");
     } else {
         DEBUG("ERROR: wrong argument\n");
     }
