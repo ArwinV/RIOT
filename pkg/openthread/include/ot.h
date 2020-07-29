@@ -32,8 +32,10 @@ extern "C" {
 #include "net/ieee802154.h"
 #include "net/ethernet.h"
 #include "net/netdev.h"
+#include "net/ipv6.h"
 #include "thread.h"
 #include "openthread/instance.h"
+#include "openthread/udp.h"
 
 /**
  * @name    Openthread message types
@@ -98,10 +100,15 @@ typedef struct {
 /**
  * @brief   Struct containing context for OpenThread UDP
  */
+typedef void (*ot_cb_t)(void*, otMessage*, const otMessageInfo*);
 typedef struct {
     otUdpSocket ot_sock;                                      /**< OpenThread UDP socket */
-    void cb(void*, otMessage*, const otMessageInfo*)          /**< Callback function */
-    void* context;                                            /**< Application specific context */
+    ot_cb_t cb;                                               /**< Callback function */
+	ipv6_addr_t ip_addr;
+	uint16_t port;
+	void* tx_buf;
+	size_t tx_len;
+    void *rx_ctx;                                             /**< Application specific received context */
 } ot_udp_context_t;
 
 /**

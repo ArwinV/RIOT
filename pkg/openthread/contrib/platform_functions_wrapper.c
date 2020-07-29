@@ -42,7 +42,9 @@ OT_COMMAND ot_panid(otInstance* ot_instance, void* arg, void* answer);
 OT_COMMAND ot_parent(otInstance* ot_instance, void* arg, void* answer);
 OT_COMMAND ot_state(otInstance* ot_instance, void* arg, void* answer);
 OT_COMMAND ot_thread(otInstance* ot_instance, void* arg, void* answer);
+OT_COMMAND ot_ifconfig(otInstance* ot_instance, void* arg, void* answer);
 OT_COMMAND ot_udpopen(otInstance* ot_instance, void* arg, void* answer);
+OT_COMMAND ot_udpsend(otInstance* ot_instance, void* arg, void* answer);
 
 /**
  * @brief   Struct containing an OpenThread job command
@@ -76,7 +78,11 @@ const ot_command_t otCommands[] =
     { "state", &ot_state },
     /* thread: arg "start"/"stop": start/stop thread operation */
     { "thread", &ot_thread },
-    /* udpopen: arg callback function: open udp socket */
+	/* ifconfig: arg "up"/"down": set link up/down */
+    { "ifconfig", &ot_ifconfig },
+    /* udpopen: arg udp context struct: open udp socket */
+    { "udpopen", &ot_udpopen },
+    /* udpopen: arg udp context struct: send udp packet */
     { "udpopen", &ot_udpopen },
 };
 
@@ -315,14 +321,58 @@ OT_COMMAND ot_thread(otInstance* ot_instance, void* arg, void* answer) {
     return 0;
 }
 
+OT_COMMAND ot_ifconfig(otInstance* ot_instance, void* arg, void* answer) {
+    (void)answer;
+
+    if (arg != NULL) {
+        if (strcmp((char*)arg, "up") == 0) {
+            otIp6SetEnabled(ot_instance, true);
+            DEBUG("Link up\n");
+        } else if (strcmp((char*)arg, "down") == 0) {
+            otIp6SetEnabled(ot_instance, false);
+            DEBUG("Link down\n");
+        } else {
+            DEBUG("ERROR: ifconfig available args: up/down\n");
+        }
+    } else {
+        DEBUG("ERROR: wrong argument\n");
+    }
+    return 0;
+}
+
 OT_COMMAND ot_udpopen(otInstance* ot_instance, void* arg, void* answer) {
     (void)answer;
 
     ot_udp_context_t *ctx = arg;
     if (arg != NULL) {
-        memset(ctx->ot_sock, 0, sizeof(otUdpSocket));	
-        otUdpOpen(ot_instance, ctx->ot_sock, ctx->cb, ctx->context);
+        memset(&ctx->ot_sock, 0, sizeof(otUdpSocket));	
+        otUdpOpen(ot_instance, &ctx->ot_sock, ctx->cb, ctx->rx_ctx);
         DEBUG("Udp open\n");
+    } else {
+        DEBUG("ERROR: wrong argument\n");
+    }
+    return 0;
+}
+
+OT_COMMAND ot_udpsend(otInstance* ot_instance, void* arg, void* answer) {
+    (void)answer;
+
+    if (arg != NULL) {
+        ot_udp_context_t *ctx = arg;
+
+		/* Udp message */
+		otMessage *message;
+		message = otUdpNewMessage(ot_instance, NULL);
+		otMessageSetLength(message, ctx->tx_len);
+		otMessageWrite(message, 0, ctx->tx_buf, ctx->tx_len);
+
+		/* Message info */
+		otMessageInfo messageInfo;
+		memcpy(&messageInfo.mPeerAddr.mFields, &ctx->ip_addr, sizeof(ipv6_addr_t));
+		messageInfo.mPeerPort = ctx->port;
+
+		otUdpSend(&ctx->ot_sock, message, &messageInfo);
+        DEBUG("Udp message send\n");
     } else {
         DEBUG("ERROR: wrong argument\n");
     }
