@@ -104,10 +104,10 @@ typedef void (*ot_cb_t)(void*, otMessage*, const otMessageInfo*);
 typedef struct {
     otUdpSocket ot_sock;                                      /**< OpenThread UDP socket */
     ot_cb_t cb;                                               /**< Callback function */
-	ipv6_addr_t ip_addr;
-	uint16_t port;
-	void* tx_buf;
-	size_t tx_len;
+    ipv6_addr_t ip_addr;
+    uint16_t port;
+    void* tx_buf;
+    size_t tx_len;
     void *rx_ctx;                                             /**< Application specific received context */
 } ot_udp_context_t;
 

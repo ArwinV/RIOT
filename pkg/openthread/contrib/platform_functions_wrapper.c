@@ -78,12 +78,12 @@ const ot_command_t otCommands[] =
     { "state", &ot_state },
     /* thread: arg "start"/"stop": start/stop thread operation */
     { "thread", &ot_thread },
-	/* ifconfig: arg "up"/"down": set link up/down */
+    /* ifconfig: arg "up"/"down": set link up/down */
     { "ifconfig", &ot_ifconfig },
     /* udpopen: arg udp context struct: open udp socket */
     { "udpopen", &ot_udpopen },
-    /* udpopen: arg udp context struct: send udp packet */
-    { "udpopen", &ot_udpopen },
+    /* udpsend: arg udp context struct: send udp packet */
+    { "udpsend", &ot_udpsend },
 };
 
 uint8_t ot_exec_command(otInstance *ot_instance, const char* command, void *arg, void* answer) {
@@ -360,18 +360,18 @@ OT_COMMAND ot_udpsend(otInstance* ot_instance, void* arg, void* answer) {
     if (arg != NULL) {
         ot_udp_context_t *ctx = arg;
 
-		/* Udp message */
-		otMessage *message;
-		message = otUdpNewMessage(ot_instance, NULL);
-		otMessageSetLength(message, ctx->tx_len);
-		otMessageWrite(message, 0, ctx->tx_buf, ctx->tx_len);
+        /* Udp message */
+        otMessage *message;
+        message = otUdpNewMessage(ot_instance, NULL);
+        otMessageSetLength(message, ctx->tx_len);
+        otMessageWrite(message, 0, ctx->tx_buf, ctx->tx_len);
 
-		/* Message info */
-		otMessageInfo messageInfo;
-		memcpy(&messageInfo.mPeerAddr.mFields, &ctx->ip_addr, sizeof(ipv6_addr_t));
-		messageInfo.mPeerPort = ctx->port;
+        /* Message info */
+        otMessageInfo messageInfo;
+        memcpy(&messageInfo.mPeerAddr.mFields, &ctx->ip_addr, sizeof(ipv6_addr_t));
+        messageInfo.mPeerPort = ctx->port;
 
-		otUdpSend(&ctx->ot_sock, message, &messageInfo);
+        otUdpSend(&ctx->ot_sock, message, &messageInfo);
         DEBUG("Udp message send\n");
     } else {
         DEBUG("ERROR: wrong argument\n");
